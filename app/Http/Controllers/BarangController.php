@@ -31,50 +31,50 @@ class BarangController extends Controller
     public function store(Request $request)
     {
         // Validasi data yang dikirimkan melalui form
-    $request->validate([
-        'nama_barang' => 'required|string|max:255',
-        'kategori' => 'required|string|max:255',
-        'harga_beli' => 'required|numeric',
-        'harga_jual' => 'required|numeric',
-        'pajak' => 'required|numeric',
-        'deskripsi' => 'required|string',
-        'gambar' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Ubah sesuai dengan ekstensi gambar yang diperbolehkan dan ukuran maksimal
-        'tahun_beli' => 'required|integer',
-    ]);
+        $request->validate([
+            'nama_barang' => 'required|string|max:255',
+            'kategori' => 'required|string|max:255',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
+            'pajak' => 'required|numeric',
+            'deskripsi' => 'required|string',
+            'gambar' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Ubah sesuai dengan ekstensi gambar yang diperbolehkan dan ukuran maksimal
+            'tahun_beli' => 'required|integer',
+        ]);
 
-    // Mengkonversi input pajak menjadi persentase jika lebih besar dari 1
-    if ($request->input('pajak') > 1) {
-        $request->merge(['pajak' => $request->input('pajak') / 100]);
-    }
+        // Mengkonversi input pajak menjadi persentase jika lebih besar dari 1
+        if ($request->input('pajak') > 1) {
+            $request->merge(['pajak' => $request->input('pajak') / 100]);
+        }
 
-    // Simpan data barang ke dalam database menggunakan Query Builder
-    DB::table('barangs')->insert([
-        'nama_barang' => $request->input('nama_barang'),
-        'kategori' => $request->input('kategori'),
-        'harga_beli' => $request->input('harga_beli'),
-        'harga_jual' => $request->input('harga_jual'),
-        'pajak' => $request->input('pajak'),
-        'deskripsi' => $request->input('deskripsi'),
-        'tahun_beli' => $request->input('tahun_beli'),
-        'gambar' => '', // Nama gambar akan diisi nanti setelah proses upload
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
+        // Simpan data barang ke dalam database menggunakan Query Builder
+        DB::table('barangs')->insert([
+            'nama_barang' => $request->input('nama_barang'),
+            'kategori' => $request->input('kategori'),
+            'harga_beli' => $request->input('harga_beli'),
+            'harga_jual' => $request->input('harga_jual'),
+            'pajak' => $request->input('pajak'),
+            'deskripsi' => $request->input('deskripsi'),
+            'tahun_beli' => $request->input('tahun_beli'),
+            'gambar' => '', // Nama gambar akan diisi nanti setelah proses upload
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
-    // Upload gambar
-    if ($request->hasFile('gambar')) {
-        $gambar = $request->file('gambar');
-        $gambarName = time() . '.' . $gambar->getClientOriginalExtension();
-        $gambar->move(public_path('uploads/barang'), $gambarName);
+        // Upload gambar
+        if ($request->hasFile('gambar')) {
+            $gambar = $request->file('gambar');
+            $gambarName = time() . '.' . $gambar->getClientOriginalExtension();
+            $gambar->move(public_path('uploads/barang'), $gambarName);
 
-        // Update nama gambar dalam database
-        DB::table('barangs')
-            ->where('nama_barang', $request->input('nama_barang'))
-            ->update(['gambar' => $gambarName]);
-    }
+            // Update nama gambar dalam database
+            DB::table('barangs')
+                ->where('nama_barang', $request->input('nama_barang'))
+                ->update(['gambar' => $gambarName]);
+        }
 
-    // Redirect ke halaman lain atau tampilkan pesan sukses
-    return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan');
+        // Redirect ke halaman lain atau tampilkan pesan sukses
+        return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan');
     }
 
     /**
@@ -88,18 +88,76 @@ class BarangController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Barang $barang)
+    public function edit($id)
     {
-        return response()->json($barang);
+        $barang = DB::table('barangs')->where('id', $id)->first();
+
+        if (!$barang) {
+            return redirect()->route('barang.index')->with('error', 'Barang tidak ditemukan.');
+        }
+
+        return view('barang.edit', compact('barang'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Barang $barang)
+    public function update(Request $request, $id)
     {
-        //
+        // Validasi input
+        $request->validate([
+            'nama_barang' => 'required|string|max:255',
+            'kategori' => 'required|string|max:255',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
+            'pajak' => 'required|numeric',
+            'deskripsi' => 'required|string',
+            'gambar' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Sesuaikan dengan aturan validasi gambar yang Anda inginkan
+            'tahun_beli' => 'required|integer',
+        ]);
+
+        // Mengkonversi input pajak menjadi persentase jika lebih besar dari 1
+        if ($request->input('pajak') > 1) {
+            $request->merge(['pajak' => $request->input('pajak') / 100]);
+        }
+
+        // Cari data barang berdasarkan ID
+        $barang = DB::table('barangs')->where('id', $id)->first();
+
+        if (!$barang) {
+            return redirect()->route('barang.index')->with('error', 'Barang tidak ditemukan');
+        }
+
+        // Update data barang menggunakan Query Builder
+        DB::table('barangs')
+            ->where('id', $id)
+            ->update([
+                'nama_barang' => $request->input('nama_barang'),
+                'kategori' => $request->input('kategori'),
+                'harga_beli' => $request->input('harga_beli'),
+                'harga_jual' => $request->input('harga_jual'),
+                'pajak' => $request->input('pajak'),
+                'deskripsi' => $request->input('deskripsi'),
+                'tahun_beli' => $request->input('tahun_beli'),
+                'updated_at' => now(),
+            ]);
+
+        // Upload gambar jika ada
+        if ($request->hasFile('gambar')) {
+            $gambar = $request->file('gambar');
+            $gambarName = time() . '.' . $gambar->getClientOriginalExtension();
+            $gambar->move(public_path('uploads/barang'), $gambarName);
+
+            // Update nama gambar dalam database
+            DB::table('barangs')
+                ->where('id', $id)
+                ->update(['gambar' => $gambarName]);
+        }
+
+        // Redirect ke halaman lain atau tampilkan pesan sukses
+        return redirect()->route('barang.index')->with('success', 'Barang berhasil diupdate');
     }
+
 
     /**
      * Remove the specified resource from storage.

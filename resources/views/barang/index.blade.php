@@ -39,18 +39,18 @@
                             <td>{{ $dt->gambar }}</td>
                             <td>{{ $dt->tahun_beli }}</td>
                             <td>
-                              <div class="row d-flex justify-content-around">
-                                  <div class="col-md-5 p-0">
-                                      <a href="{{ URL::to('barang/' . $dt->id . '/edit') }}" class="btn btn-warning btn-sm btn-block" title="Edit"><i class="fas fa-edit"></i></a>
-                                  </div>
-                                  <div class="col-md-5 p-0">
-                                      <form action="{{url('barang', [$dt->id])}}" method="POST">
-                                          <input type="hidden" name="_method" value="DELETE">
-                                          <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                          <button type="submit" class="btn btn-danger btn-sm btn-block" title="Delete"><i class="fas fa-trash"></i></button>
-                                      </form>
-                                  </div>
-                              </div>
+                                <div class="row d-flex justify-content-around">
+                                    <div class="col-md-5 p-0">
+                                        <a href="{{ URL::to('barang/' . $dt->id . '/edit') }}" class="btn btn-warning btn-sm btn-block" title="Edit"><i class="fas fa-edit"></i></a>
+                                    </div>
+                                    <div class="col-md-5 p-0">
+                                        <form action="{{url('barang', [$dt->id])}}" method="POST">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-danger btn-sm btn-block" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
                             </td>
                         </tr>                                             
                         @endforeach
