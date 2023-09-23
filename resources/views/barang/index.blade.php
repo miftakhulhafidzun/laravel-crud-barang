@@ -25,7 +25,6 @@
                             <th>Harga Beli</th>
                             <th>Harga Jual</th>
                             <th>Pajak</th>
-                            <th>Deskripsi</th>
                             <th>Gambar</th>
                             <th>Tahun Beli</th>                            
                             <th>Aksi</th>                            
@@ -36,23 +35,22 @@
                         @foreach ($data as $dt)                            
                         <tr>
                             <td>{{ $no++ }}</td>
-                            <td>{{ $dt->nama_barang }}</td>
+                            <td><a href="{{ URL::to('barang/' . $dt->id) }}">{{ $dt->nama_barang }}</a></td>
                             <td>{{ $dt->kategori }}</td>
                             <td>{{ $dt->harga_beli }}</td>
                             <td>{{ $dt->harga_jual }}</td>
                             <td>{{ $dt->pajak }}</td>
-                            <td>{{ $dt->deskripsi }}</td>
                             <td>{{ $dt->gambar }}</td>
                             <td>{{ $dt->tahun_beli }}</td>
                             <td>
                                 <div class="row d-flex justify-content-around">
                                     <div class="col-md-5 p-0">
-                                        <a href="{{ URL::to('barang/' . $dt->id . '/edit') }}" class="btn btn-warning btn-block" title="Edit">
+                                        <a href="{{ URL::to('barang/' . $dt->id . '/edit') }}" class="btn btn-warning btn-sm btn-block" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     </div>
                                     <div class="col-md-5 p-0">
-                                        <button type="button" class="btn btn-danger" title="Delete"
+                                        <button type="button" class="btn btn-danger btn-sm" title="Delete"
                                             onclick="loadDeleteModal({{ $dt->id }}, '{{ $dt->nama_barang }}')"><i class="fas fa-trash"></i>
                                         </button>
                                     </div>

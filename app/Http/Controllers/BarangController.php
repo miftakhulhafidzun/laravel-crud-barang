@@ -80,9 +80,10 @@ class BarangController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Barang $barang)
+    public function show($id)
     {
-        //
+        $data = DB::table('barangs')->where('id', $id)->first();
+        return view('barang.show', compact('data'));
     }
 
     /**
